@@ -1,12 +1,18 @@
 package com.blz.AddressBookMain;
 
 
+import com.google.gson.Gson;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Contact implements Serializable {
 
@@ -17,6 +23,8 @@ public class Contact implements Serializable {
 
     public Contact(){}
 
+
+
     public Contact addNewContact() throws IOException {
 
         Contact person = new Contact();
@@ -25,8 +33,8 @@ public class Contact implements Serializable {
         System.out.println("Enter First Name = ");
         person.first_name=sc.next();
 
-        System.out.println("Enter Last Name = ");
-        person.last_name=sc.next();
+//        System.out.println("Enter Last Name = ");
+//        person.last_name=sc.next();
 //
 //        System.out.println("Enter Address = ");
 //        person.address=sc.next();
@@ -43,8 +51,10 @@ public class Contact implements Serializable {
 //        System.out.println("Enter Email Address = ");
 //        person.email=sc.next();
 
-        String filePath ="D:\\BridgeLabz Assignments\\AddressBookApplication\\src\\main\\resources\\AddressBook.txt";
-        Path path = Paths.get(filePath);
+//        String filePath ="D:\\BridgeLabz Assignments\\AddressBookApplication\\src\\main\\resources\\AddressBook.txt";
+//        String csvPath = "D:\\BridgeLabz Assignments\\AddressBookApplication\\src\\main\\resources\\contacts.csv";
+        String jsonPath = "D:\\BridgeLabz Assignments\\AddressBookApplication\\src\\main\\resources\\contacts.json";
+        Path path = Paths.get(jsonPath);
 
         try {
 
@@ -65,30 +75,58 @@ public class Contact implements Serializable {
             System.out.println(object);
             objectIn.close();*/
 
-//            FileWriter fileWriter = new FileWriter(filePath);
-//            fileWriter.write(person.first_name);
-//            fileWriter.append(person.last_name);
-//            fileWriter.write(person.address);
-//            fileWriter.write(person.city);
-//            fileWriter.write(String.valueOf(person.zip));
-//            fileWriter.write(String.valueOf(person.phone_number));
-//            fileWriter.write(person.email);
-//            fileWriter.close();
-//            System.out.println("The contact was successfully written to a file");
+            /*FileWriter fileWriter = new FileWriter(filePath);
+            fileWriter.write(person.first_name);
+            fileWriter.append(person.last_name);
+            fileWriter.write(person.address);
+            fileWriter.write(person.city);
+            fileWriter.write(String.valueOf(person.zip));
+            fileWriter.write(String.valueOf(person.phone_number));
+            fileWriter.write(person.email);
+            fileWriter.close();
+            System.out.println("The contact was successfully written to a file");
 
             System.out.println("*******************************************************");
 
-//            FileReader fileReader = new FileReader(filePath);
-//            int i;
-//            while((i=fileReader.read())!=-1)
-//                System.out.print((char)i);
-//            fileReader.close();
+            FileReader fileReader = new FileReader(filePath);
+            int i;
+            while((i=fileReader.read())!=-1)
+                System.out.print((char)i);
+            fileReader.close();
 
             BufferedReader br = new BufferedReader(new FileReader(filePath));
             String line;
             while((line = br.readLine())!=null)
-                System.out.println(line);
+                System.out.println(line);*/
 
+
+            /*//CSV File reading and writing
+            Writer writer = Files.newBufferedWriter(Paths.get(csvPath));
+            StatefulBeanToCsv beantoCSV = new StatefulBeanToCsvBuilder(writer).withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).build();
+            List<Contact> contactList = new ArrayList<>();
+            contactList.add(person);
+            beantoCSV.write(contactList);
+            //beantoCSV.write(person.last_name);
+            writer.close();
+
+            Reader reader = Files.newBufferedReader(path);
+            CsvToBean<Contact> csvToBean = new CsvToBeanBuilder(reader).withType(Contact.class).build();
+            contactList = csvToBean.parse();
+            System.out.println(contactList);*/
+
+            Gson gson = new Gson();
+            List<Contact> contactList = new ArrayList<>();
+            contactList.add(person);
+            String json = gson.toJson(contactList);
+
+            FileWriter fileWriter = new FileWriter(jsonPath);
+            fileWriter.write(json);
+            fileWriter.close();
+
+            BufferedReader br = new BufferedReader(new FileReader(jsonPath));
+            Contact[] contacts = gson.fromJson(br,Contact[].class);
+            System.out.println(Arrays.asList(contactList));
+            br.close();
 
         } catch (Exception ex) {
             ex.printStackTrace();
